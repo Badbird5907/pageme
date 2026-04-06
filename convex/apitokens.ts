@@ -4,6 +4,7 @@ import { ConvexError, v } from "convex/values";
 
 const authenticatedApiTokenValidator = v.union(
   v.object({
+    id: v.id("apiTokens"),
     name: v.string(),
     expiresAt: v.optional(v.number()),
   }),
@@ -31,6 +32,7 @@ export const authenticateApiToken = internalQuery({
 
     return {
       name: existing.name,
+      id: existing._id,
       ...(existing.expiresAt === undefined
         ? {}
         : { expiresAt: existing.expiresAt }),
@@ -45,6 +47,7 @@ export const listAPITokens = query({
       token: v.string(),
       name: v.string(),
       createdAt: v.number(),
+      lastUsedAt: v.optional(v.number()),
       expiresAt: v.optional(v.number()),
     }),
   ),
@@ -54,10 +57,11 @@ export const listAPITokens = query({
       throw new ConvexError("Unauthorized");
     }
     const tokens = await ctx.db.query("apiTokens").collect();
-    return tokens.map(({ token, name, createdAt, expiresAt }) => ({
+    return tokens.map(({ token, name, createdAt, expiresAt, lastUsedAt }) => ({
       token,
       name,
       createdAt,
+      lastUsedAt,
       ...(expiresAt === undefined ? {} : { expiresAt }),
     }));
   },

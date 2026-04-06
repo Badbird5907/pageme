@@ -20,6 +20,7 @@ import { ColumnDef, DataTable } from "@/components/ui/data-table";
 type APITokenListItem = {
   createdAt: number;
   expiresAt?: number;
+  lastUsedAt?: number;
   name: string;
   token: string;
 };
@@ -76,6 +77,15 @@ export function APITokensTable() {
               ? new Date(row.original.expiresAt).toLocaleString()
               : "-"}
           </span>
+        );
+      },
+    },
+    {
+      header: "Last Used At",
+      accessorKey: "lastUsedAt",
+      cell: ({ row }) => {
+        return (
+          <span>{row.original.lastUsedAt ? new Date(row.original.lastUsedAt).toLocaleString() : "-"}</span>
         );
       },
     },

@@ -73,43 +73,48 @@ export function ActiveUntilField({
   return (
     <Field data-invalid={isInvalid}>
       <FieldLabel htmlFor={name}>Active Until</FieldLabel>
-      <div className="flex items-center gap-2">
-        <Popover>
-          <PopoverTrigger
-            render={
-              <Button
-                id={name}
-                variant="outline"
-                type="button"
-                className={cn(
-                  "w-full justify-between text-left font-normal",
-                  !date && "text-muted-foreground",
-                  isInvalid &&
-                    "border-destructive ring-3 ring-destructive/20 dark:ring-destructive/40",
-                )}
-                aria-invalid={isInvalid}
+      <div className="flex min-w-0 items-center gap-2">
+        <div className="min-w-0 flex-1">
+          <Popover>
+            <PopoverTrigger
+              render={
+                <Button
+                  id={name}
+                  variant="outline"
+                  type="button"
+                  className={cn(
+                    "min-w-0 w-full justify-between text-left font-normal",
+                    !date && "text-muted-foreground",
+                    isInvalid &&
+                      "border-destructive ring-3 ring-destructive/20 dark:ring-destructive/40",
+                  )}
+                  aria-invalid={isInvalid}
+                />
+              }
+              onBlur={onBlur}
+            >
+              <span className="min-w-0 flex-1 truncate text-left">
+                {date ? format(date, "PPP") : "No expiry"}
+              </span>
+              <CalendarIcon className="size-4 shrink-0" />
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={date}
+                defaultMonth={date}
+                onSelect={(nextDate) => {
+                  onChange(nextDate ? endOfDay(nextDate).getTime() : null);
+                }}
               />
-            }
-            onBlur={onBlur}
-          >
-            <span>{date ? format(date, "PPP") : "No expiry"}</span>
-            <CalendarIcon className="size-4" />
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={date}
-              defaultMonth={date}
-              onSelect={(nextDate) => {
-                onChange(nextDate ? endOfDay(nextDate).getTime() : null);
-              }}
-            />
-          </PopoverContent>
-        </Popover>
+            </PopoverContent>
+          </Popover>
+        </div>
         <Button
           type="button"
           variant="ghost"
           size="icon-sm"
+          className="shrink-0"
           onClick={() => onChange(null)}
           disabled={value === null}
           aria-label="Clear active until date"

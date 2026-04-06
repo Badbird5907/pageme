@@ -9,6 +9,7 @@ import { env } from "./env";
 import { getJwtJwks } from "../src/lib/jwt";
 import { Muppet } from "muppet";
 import { StreamableHTTPTransport } from "@hono/mcp";
+import { Id } from "./_generated/dataModel";
 
 const app: HonoWithConvex<ActionCtx> = new Hono();
 
@@ -27,6 +28,7 @@ const loginBodySchema = z.object({
 
 type AuthenticatedApiToken = {
   tokenName: string;
+  tokenId: string;
 };
 
 app.get("/.well-known/jwks.json", async (c) => {
@@ -53,7 +55,7 @@ app.post("/auth/login", async (c) => {
   }
 
   try {
-    const token = await c.env.runQuery(internal.auth.getLoginToken, parsed.data);
+    const token = await c.env.runMutation(internal.auth.getLoginToken, parsed.data);
     return c.json({ token: token.token, isAdmin: token.isAdmin }, 200);
   } catch (error) {
     if (error instanceof ConvexError) {
@@ -106,6 +108,7 @@ async function authenticateMcpRequest(
     ok: true,
     token: {
       tokenName: authenticatedToken.name,
+      tokenId: authenticatedToken.id,
     },
   };
 }
@@ -126,6 +129,7 @@ function createMcp(convex: ActionCtx, auth: AuthenticatedApiToken) {
     const message = c.message.params.arguments.message;
     const result = await convex.runAction(internal.pager.sendPageFromApiToken, {
       apiTokenName: auth.tokenName,
+      tokenId: auth.tokenId as Id<"apiTokens">,
       message,
     });
 

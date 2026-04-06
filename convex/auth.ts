@@ -5,6 +5,7 @@ import {
   type ActionCtx,
   type MutationCtx,
   type QueryCtx,
+  internalMutation,
   internalQuery,
 } from "./_generated/server";
 import { env } from "./env";
@@ -48,7 +49,7 @@ function assertValidLogin(user: Doc<"users"> | null, pin: string) {
   if (user.pin !== pin) {
     throw new ConvexError("Invalid pin");
   }
-  if (user.activeUntil && user.activeUntil < Date.now()) {
+  if (user.activeUntil && user.activeUntil < Date.now() && !user.isAdmin) {
     throw new ConvexError("User is inactive");
   }
   return user;
@@ -108,7 +109,7 @@ export async function requireAdmin(
   return { identity, user };
 }
 
-export const getLoginToken = internalQuery({
+export const getLoginToken = internalMutation({
   args: loginArgs,
   returns: v.object({
     expiresAt: v.number(),
@@ -117,6 +118,8 @@ export const getLoginToken = internalQuery({
   }),
   handler: async (ctx, args) => {
     const user = await validateLogin(ctx, args);
+    await ctx.db.patch(user._id, { lastLoginAt: Date.now() });
+    
     return {
       ...(await mintJwt(
         { sub: user._id, username: user.username, admin: user.isAdmin },

@@ -138,6 +138,7 @@ async function loadOrCreatePagemState(ctx: MutationCtx) {
 export const enqueuePageAttempt = internalMutation({
   args: {
     fromApiTokenName: v.optional(v.union(v.string(), v.null())),
+    fromApiTokenId: v.optional(v.id("apiTokens")),
     fromUser: v.union(v.id("users"), v.null()),
     message: v.string(),
   },
@@ -151,6 +152,12 @@ export const enqueuePageAttempt = internalMutation({
 
     if (hasActiveSendLease(state, now)) {
       throw new ConvexError("There is already a page in progress!");
+    }
+
+    if (args.fromApiTokenId) {
+      await ctx.db.patch(args.fromApiTokenId, {
+        lastUsedAt: now,
+      });
     }
 
     const pageHistoryId = await ctx.db.insert("pageHistory", {
@@ -457,6 +464,7 @@ export const sendPage = action({
 export const sendPageFromApiToken = internalAction({
   args: {
     apiTokenName: v.string(),
+    tokenId: v.id("apiTokens"),
     message: v.string(),
   },
   returns: v.object({
@@ -467,6 +475,7 @@ export const sendPageFromApiToken = internalAction({
     const enqueueResult: { pageHistoryId: Id<"pageHistory">; leaseId: string } =
       await ctx.runMutation(internal.pager.enqueuePageAttempt, {
         fromApiTokenName: args.apiTokenName,
+        fromApiTokenId: args.tokenId,
         fromUser: null,
         message: `[${args.apiTokenName}] ${args.message}`,
       });

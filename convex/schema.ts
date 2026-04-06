@@ -35,6 +35,7 @@ export default defineSchema({
     isAdmin: v.boolean(),
     createdAt: v.number(),
     activeUntil: v.optional(v.number()),
+    lastLoginAt: v.optional(v.number()),
   }).index("by_username", ["username"]),
   settings: defineTable({
     key: v.string(),
@@ -45,6 +46,7 @@ export default defineSchema({
     name: v.string(),
     createdAt: v.number(),
     expiresAt: v.optional(v.number()),
+    lastUsedAt: v.optional(v.number()),
   }).index("by_token", ["token"]),
   pageHistory: defineTable({
     fromUser: v.union(v.id("users"), v.null()),
