@@ -28,7 +28,6 @@ const pageAttemptDocValidator = v.object({
   fromUser: v.id("users"),
   message: v.string(),
   createdAt: v.number(),
-  executing: v.optional(v.boolean()),
   status: v.optional(pageAttemptStatusValidator),
   startedAt: v.optional(v.union(v.number(), v.null())),
   finishedAt: v.optional(v.union(v.number(), v.null())),

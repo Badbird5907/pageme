@@ -8,9 +8,12 @@
  * @module
  */
 
+import type * as admin from "../admin.js";
+import type * as apitokens from "../apitokens.js";
 import type * as auth from "../auth.js";
 import type * as env from "../env.js";
 import type * as http from "../http.js";
+import type * as mcp from "../mcp.js";
 import type * as pagem_index from "../pagem/index.js";
 import type * as pagem_pager from "../pagem/pager.js";
 import type * as pagem_pagerState from "../pagem/pagerState.js";
@@ -23,9 +26,12 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  admin: typeof admin;
+  apitokens: typeof apitokens;
   auth: typeof auth;
   env: typeof env;
   http: typeof http;
+  mcp: typeof mcp;
   "pagem/index": typeof pagem_index;
   "pagem/pager": typeof pagem_pager;
   "pagem/pagerState": typeof pagem_pagerState;

@@ -36,18 +36,20 @@ export default defineSchema({
     createdAt: v.number(),
     activeUntil: v.optional(v.number()),
   }).index("by_username", ["username"]),
-  mcpTokens: defineTable({
+  settings: defineTable({
+    key: v.string(),
+    value: v.any(),
+  }).index("by_key", ["key"]),
+  apiTokens: defineTable({
     token: v.string(),
     name: v.string(),
     createdAt: v.number(),
     expiresAt: v.optional(v.number()),
-  }),
+  }).index("by_token", ["token"]),
   pageHistory: defineTable({
     fromUser: v.id("users"),
     message: v.string(),
     createdAt: v.number(),
-    // Optional for compatibility with historical pageHistory documents.
-    executing: v.optional(v.boolean()),
     status: v.optional(v.union(
       v.literal("pending"),
       v.literal("running"),

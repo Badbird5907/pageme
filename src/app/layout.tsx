@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Navbar } from "@/components/navbar";
 import "./globals.css";
 import { ConvexClientProvider } from "./provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,7 +35,10 @@ export default function RootLayout({
         <Navbar />
         <main className="flex flex-1 flex-col">
           <ConvexClientProvider>
-            {children}
+            <TooltipProvider>
+              {children}
+              <Toaster />
+            </TooltipProvider>
           </ConvexClientProvider>
         </main>
       </body>
