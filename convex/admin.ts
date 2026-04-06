@@ -1,6 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { requireAdmin } from "./auth";
+import { paginationOptsValidator } from "convex/server";
 
 export const listUsers = query({
   args: {},
@@ -103,5 +104,18 @@ export const deleteUser = mutation({
     }
     await ctx.db.delete(args.userId);
     return { success: true };
+  },
+})
+
+export const listPages = query({
+  args: {
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    const { user } = await requireAdmin(ctx);
+    if (!user.isAdmin) {
+      throw new ConvexError("Unauthorized");
+    }
+    return await ctx.db.query("pageHistory").order("desc").paginate(args.paginationOpts);
   },
 })

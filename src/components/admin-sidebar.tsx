@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ShieldIcon, UsersIcon } from "lucide-react";
+import { LogsIcon, ShieldIcon, UsersIcon } from "lucide-react";
 
 import {
   Sidebar,
@@ -26,6 +26,11 @@ const adminNavItems = [
     href: "/admin/api",
     label: "MCP / API",
     icon: MCPIcon,
+  },
+  {
+    href: "/admin/log",
+    label: "Log",
+    icon: LogsIcon
   }
 ];
 
