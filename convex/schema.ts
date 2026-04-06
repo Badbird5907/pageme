@@ -18,6 +18,12 @@ export const pagemStateFields = {
   lastSendAt: v.union(v.number(), v.null()),
   lastErrorMessage: v.union(v.string(), v.null()),
   lastErrorAt: v.union(v.number(), v.null()),
+  // Optional for compatibility with existing pagemState documents.
+  sendLeaseId: v.optional(v.union(v.string(), v.null())),
+  // Optional for compatibility with existing pagemState documents.
+  sendLeaseExpiresAt: v.optional(v.union(v.number(), v.null())),
+  // Optional for compatibility with existing pagemState documents.
+  sendLeasePageHistoryId: v.optional(v.union(v.id("pageHistory"), v.null())),
 };
 
 export default defineSchema({
@@ -40,5 +46,22 @@ export default defineSchema({
     fromUser: v.id("users"),
     message: v.string(),
     createdAt: v.number(),
-  }).index("by_fromUser", ["fromUser"]).index("by_createdAt", ["createdAt"]),
+    // Optional for compatibility with historical pageHistory documents.
+    executing: v.optional(v.boolean()),
+    status: v.optional(v.union(
+      v.literal("pending"),
+      v.literal("running"),
+      v.literal("succeeded"),
+      v.literal("failed"),
+    )),
+    startedAt: v.optional(v.union(v.number(), v.null())),
+    finishedAt: v.optional(v.union(v.number(), v.null())),
+    errorMessage: v.optional(v.union(v.string(), v.null())),
+    resultStatus: v.optional(v.union(v.number(), v.null())),
+    resultRedirectedTo: v.optional(v.union(v.string(), v.null())),
+    resultReauthenticated: v.optional(v.union(v.boolean(), v.null())),
+    leaseId: v.optional(v.union(v.string(), v.null())),
+  }).index("by_fromUser", ["fromUser"])
+  .index("by_createdAt", ["createdAt"])
+  .index("by_createdAt_fromUser", ["createdAt", "fromUser"])
 });

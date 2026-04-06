@@ -3,8 +3,11 @@ import { z } from "zod";
 
 export const env = createEnv({
   server: {
-    AUTH_JWT_SECRET: z.string().min(1),
-    PAGEM_BASE_URL: z.string().url().optional(),
+    AUTH_JWT_AUDIENCE: z.string().min(1),
+    AUTH_JWT_ISSUER: z.string().url(),
+    AUTH_JWT_KID: z.string().min(1),
+    AUTH_JWT_PRIVATE_KEY_PEM: z.string().min(1),
+    AUTH_JWT_PUBLIC_JWK_JSON: z.string().min(1),
     PAGEM_GROUP_PAGE_TYPE: z.string().min(1).optional(),
     PAGEM_PAGE_DIRECTORY_ENTRY_ID: z
       .string()

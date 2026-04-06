@@ -26,6 +26,9 @@ function defaultState() {
     lastSendAt: null,
     lastErrorMessage: null,
     lastErrorAt: null,
+    sendLeaseId: null,
+    sendLeaseExpiresAt: null,
+    sendLeasePageHistoryId: null,
   };
 }
 

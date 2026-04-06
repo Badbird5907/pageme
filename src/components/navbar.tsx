@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LayoutDashboardIcon, LogOutIcon, ShieldIcon } from "lucide-react";
+import { HistoryIcon, LayoutDashboardIcon, LogOutIcon, ShieldIcon } from "lucide-react";
 
 import { useAuth } from "@/lib/auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -79,6 +79,15 @@ export function Navbar() {
                         <span className="font-bold">{username}</span>
                     </span>
                   </DropdownMenuLabel>
+                </DropdownMenuGroup>
+                <DropdownMenuGroup>
+                  <DropdownMenuItem
+                    className="cursor-pointer hover:bg-muted"
+                    onClick={() => router.push("/history")}
+                  >
+                    <HistoryIcon />
+                    Page history
+                  </DropdownMenuItem>
                 </DropdownMenuGroup>
                 {isAdmin && (
                   <>

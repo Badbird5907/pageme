@@ -8,7 +8,12 @@ export async function getAuthClaims(): Promise<JwtClaims | null> {
   const token = cookieStore.get("token")?.value;
   if (!token) return null;
   try {
-    return await verifyJwt(token, env.AUTH_JWT_SECRET);
+    return await verifyJwt(token, {
+      audience: env.AUTH_JWT_AUDIENCE,
+      issuer: env.AUTH_JWT_ISSUER,
+      kid: env.AUTH_JWT_KID,
+      publicJwkJson: env.AUTH_JWT_PUBLIC_JWK_JSON,
+    });
   } catch {
     return null;
   }

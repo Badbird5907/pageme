@@ -5,6 +5,8 @@ import { ConvexError } from "convex/values";
 import { z } from "zod";
 import { internal } from "./_generated/api";
 import { ActionCtx } from "./_generated/server";
+import { env } from "./env";
+import { getJwtJwks } from "../src/lib/jwt";
 
 const app: HonoWithConvex<ActionCtx> = new Hono();
 
@@ -19,6 +21,16 @@ app.use(
 const loginBodySchema = z.object({
   pin: z.string(),
   username: z.string(),
+});
+
+app.get("/.well-known/jwks.json", async (c) => {
+  return c.json(
+    getJwtJwks({
+      kid: env.AUTH_JWT_KID,
+      publicJwkJson: env.AUTH_JWT_PUBLIC_JWK_JSON,
+    }),
+    200,
+  );
 });
 
 app.post("/auth/login", async (c) => {

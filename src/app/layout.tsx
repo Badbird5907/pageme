@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Navbar } from "@/components/navbar";
 import "./globals.css";
+import { ConvexClientProvider } from "./provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +31,11 @@ export default function RootLayout({
     >
       <body className="flex min-h-full flex-col">
         <Navbar />
-        <main className="flex flex-1 flex-col">{children}</main>
+        <main className="flex flex-1 flex-col">
+          <ConvexClientProvider>
+            {children}
+          </ConvexClientProvider>
+        </main>
       </body>
     </html>
   );

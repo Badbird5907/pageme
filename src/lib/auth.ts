@@ -1,41 +1,91 @@
 "use client";
+
 import { env } from "@/env";
 import { useCallback, useEffect, useState } from "react";
+
+type CookieValue = {
+  name: string;
+  value: string;
+};
+
+function readDocumentCookie(name: string) {
+  if (typeof document === "undefined") {
+    return null;
+  }
+
+  const value = document.cookie
+    .split("; ")
+    .find((cookie) => cookie.startsWith(`${name}=`))
+    ?.slice(name.length + 1);
+
+  return value ? decodeURIComponent(value) : null;
+}
+
+async function getCookie(name: string): Promise<CookieValue | null> {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  if ("cookieStore" in window) {
+    const cookie = await window.cookieStore.get(name);
+    return cookie ? { name: cookie.name ?? name, value: cookie.value ?? "" } : null;
+  }
+
+  const value = readDocumentCookie(name);
+  return value === null ? null : { name, value };
+}
+
+async function setCookie(name: string, value: string) {
+  if ("cookieStore" in window) {
+    await window.cookieStore.set(name, value);
+    return;
+  }
+
+  document.cookie = `${name}=${encodeURIComponent(value)}; path=/`;
+}
+
+async function deleteCookie(name: string) {
+  if ("cookieStore" in window) {
+    await window.cookieStore.delete(name);
+    return;
+  }
+
+  document.cookie = `${name}=; Max-Age=0; path=/`;
+}
 
 export const login = async (username: string, pin: string) => {
   const response = await fetch(`${env.NEXT_PUBLIC_CONVEX_SITE_URL}/auth/login`, {
     method: "POST",
     body: JSON.stringify({ username, pin }),
   });
+
   if (!response.ok) {
     throw new Error("Failed to login");
   }
-  const data = await response.json() as { token: string; isAdmin?: boolean };
-  const token: string = data.token;
 
-  await window.cookieStore.set("token", token);
-  await window.cookieStore.set("username", username);
-  await window.cookieStore.set("admin", data.isAdmin === true ? "true" : "false");
+  const data = (await response.json()) as { isAdmin?: boolean; token: string };
+
+  await Promise.all([
+    setCookie("token", data.token),
+    setCookie("username", username),
+    setCookie("admin", data.isAdmin === true ? "true" : "false"),
+  ]);
+
   return true;
 };
 
-
 export const logout = async () => {
   await Promise.all([
-    window.cookieStore.delete("token"),
-    window.cookieStore.delete("username"),
-    window.cookieStore.delete("admin"),
+    deleteCookie("token"),
+    deleteCookie("username"),
+    deleteCookie("admin"),
   ]);
   return true;
 };
 
 export const isAuthenticated = async () => {
-  const token = await window.cookieStore.get("token");
-  const username = await window.cookieStore.get("username");
-  if (!token || !username) {
-    return false;
-  }
-  return true;
+  const token = await getCookie("token");
+  return token !== null;
 };
 
 export const useAuth = () => {
@@ -43,17 +93,23 @@ export const useAuth = () => {
   const [username, setUsername] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
 
+  const fetchAccessToken = useCallback(async () => {
+    const token = await getCookie("token");
+    return token?.value ?? null;
+  }, []);
+
   const refresh = useCallback(async () => {
     const [tokenCookie, usernameCookie, adminCookie] = await Promise.all([
-      window.cookieStore.get("token"),
-      window.cookieStore.get("username"),
-      window.cookieStore.get("admin"),
+      getCookie("token"),
+      getCookie("username"),
+      getCookie("admin"),
     ]);
 
-    const isLoggedIn = Boolean(tokenCookie?.value && usernameCookie?.value);
+    const isLoggedIn = Boolean(tokenCookie?.value);
     setAuthenticated(isLoggedIn);
     setUsername(usernameCookie?.value ?? null);
     setIsAdmin(isLoggedIn && adminCookie?.value === "true");
+
     return isLoggedIn;
   }, []);
 
@@ -61,6 +117,12 @@ export const useAuth = () => {
     const initialRefreshId = window.setTimeout(() => {
       void refresh();
     }, 0);
+
+    if (!("cookieStore" in window)) {
+      return () => {
+        window.clearTimeout(initialRefreshId);
+      };
+    }
 
     const handleCookieChange = () => {
       void refresh();
@@ -79,7 +141,7 @@ export const useAuth = () => {
       await refresh();
       return true;
     },
-    [refresh]
+    [refresh],
   );
 
   const logoutAndRefresh = useCallback(async () => {
@@ -94,6 +156,7 @@ export const useAuth = () => {
     username,
     isAdmin,
     refresh,
+    fetchAccessToken,
     login: loginAndRefresh,
     logout: logoutAndRefresh,
   };

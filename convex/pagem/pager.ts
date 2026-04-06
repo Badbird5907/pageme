@@ -62,7 +62,7 @@ function getRuntimeConfig(): RuntimeConfig {
   }
 
   return {
-    baseUrl: env.PAGEM_BASE_URL ?? PAGEM_URL,
+    baseUrl: PAGEM_URL,
     password,
     username,
   };
