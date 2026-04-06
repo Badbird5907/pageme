@@ -1,6 +1,18 @@
 import { ConvexError, v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { internalQuery, mutation, query } from "./_generated/server";
 import { requireAdmin } from "./auth";
+
+export const isMcpEnabledInternal = internalQuery({
+  args: {},
+  returns: v.boolean(),
+  handler: async (ctx) => {
+    const setting = await ctx.db
+      .query("settings")
+      .withIndex("by_key", (q) => q.eq("key", "mcp_enabled"))
+      .first();
+    return setting?.value ?? false;
+  },
+});
 
 export const getMCPEnabled = query({
   args: {},

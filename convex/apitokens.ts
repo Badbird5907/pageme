@@ -1,6 +1,42 @@
-import { mutation, query } from "./_generated/server";
+import { internalQuery, mutation, query } from "./_generated/server";
 import { requireAdmin } from "./auth";
 import { ConvexError, v } from "convex/values";
+
+const authenticatedApiTokenValidator = v.union(
+  v.object({
+    name: v.string(),
+    expiresAt: v.optional(v.number()),
+  }),
+  v.null(),
+);
+
+export const authenticateApiToken = internalQuery({
+  args: {
+    token: v.string(),
+  },
+  returns: authenticatedApiTokenValidator,
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("apiTokens")
+      .withIndex("by_token", (q) => q.eq("token", args.token))
+      .first();
+
+    if (!existing) {
+      return null;
+    }
+
+    if (existing.expiresAt !== undefined && existing.expiresAt < Date.now()) {
+      return null;
+    }
+
+    return {
+      name: existing.name,
+      ...(existing.expiresAt === undefined
+        ? {}
+        : { expiresAt: existing.expiresAt }),
+    };
+  },
+});
 
 export const listAPITokens = query({
   args: {},

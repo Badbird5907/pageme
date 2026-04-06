@@ -25,7 +25,8 @@ const pageAttemptStatusValidator = v.union(
 const pageAttemptDocValidator = v.object({
   _id: v.id("pageHistory"),
   _creationTime: v.number(),
-  fromUser: v.id("users"),
+  fromUser: v.union(v.id("users"), v.null()),
+  fromApiTokenName: v.optional(v.union(v.string(), v.null())),
   message: v.string(),
   createdAt: v.number(),
   status: v.optional(pageAttemptStatusValidator),
@@ -136,8 +137,9 @@ async function loadOrCreatePagemState(ctx: MutationCtx) {
 
 export const enqueuePageAttempt = internalMutation({
   args: {
+    fromApiTokenName: v.optional(v.union(v.string(), v.null())),
+    fromUser: v.union(v.id("users"), v.null()),
     message: v.string(),
-    userId: v.id("users"),
   },
   returns: v.object({
     leaseId: v.string(),
@@ -155,7 +157,8 @@ export const enqueuePageAttempt = internalMutation({
       createdAt: now,
       errorMessage: null,
       finishedAt: null,
-      fromUser: args.userId,
+      fromApiTokenName: args.fromApiTokenName ?? null,
+      fromUser: args.fromUser,
       leaseId: null,
       message: args.message,
       resultReauthenticated: null,
@@ -439,8 +442,33 @@ export const sendPage = action({
 
     const enqueueResult: { pageHistoryId: Id<"pageHistory">; leaseId: string } =
       await ctx.runMutation(internal.pager.enqueuePageAttempt, {
+        fromApiTokenName: null,
+        fromUser: user._id,
         message: `[${user.username}] ${args.message}`,
-        userId: user._id,
+      });
+
+    return {
+      pageHistoryId: enqueueResult.pageHistoryId,
+      status: "pending",
+    };
+  },
+});
+
+export const sendPageFromApiToken = internalAction({
+  args: {
+    apiTokenName: v.string(),
+    message: v.string(),
+  },
+  returns: v.object({
+    pageHistoryId: v.id("pageHistory"),
+    status: v.literal("pending"),
+  }),
+  handler: async (ctx, args): Promise<SendPageAccepted> => {
+    const enqueueResult: { pageHistoryId: Id<"pageHistory">; leaseId: string } =
+      await ctx.runMutation(internal.pager.enqueuePageAttempt, {
+        fromApiTokenName: args.apiTokenName,
+        fromUser: null,
+        message: `[${args.apiTokenName}] ${args.message}`,
       });
 
     return {

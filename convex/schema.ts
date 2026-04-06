@@ -47,7 +47,8 @@ export default defineSchema({
     expiresAt: v.optional(v.number()),
   }).index("by_token", ["token"]),
   pageHistory: defineTable({
-    fromUser: v.id("users"),
+    fromUser: v.union(v.id("users"), v.null()),
+    fromApiTokenName: v.optional(v.union(v.string(), v.null())),
     message: v.string(),
     createdAt: v.number(),
     status: v.optional(v.union(
