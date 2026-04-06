@@ -2,6 +2,8 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+Copy `.env.example` to `.env.local` and fill in the required values before starting the app.
+
 First, run the development server:
 
 ```bash
@@ -14,9 +16,17 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This project uses Portless in development, so `pnpm dev` starts Next.js behind `https://pageme.localhost`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+If you specifically want Turbopack, use:
+
+```bash
+pnpm dev:turbo
+```
+
+`pnpm dev` intentionally uses webpack because `next/font/google` can fail under Portless + Turbopack in dev with `http2 feature is not enabled`.
+
+You can start editing the page by modifying `src/app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 

@@ -26,13 +26,19 @@ export default defineSchema({
     username: v.string(),
     pin: v.string(),
     muted: v.boolean(), // ban them?
+    isAdmin: v.boolean(),
     createdAt: v.number(),
     activeUntil: v.optional(v.number()),
-  }),
+  }).index("by_username", ["username"]),
   mcpTokens: defineTable({
     token: v.string(),
     name: v.string(),
     createdAt: v.number(),
     expiresAt: v.optional(v.number()),
   }),
+  pageHistory: defineTable({
+    fromUser: v.id("users"),
+    message: v.string(),
+    createdAt: v.number(),
+  }).index("by_fromUser", ["fromUser"]).index("by_createdAt", ["createdAt"]),
 });

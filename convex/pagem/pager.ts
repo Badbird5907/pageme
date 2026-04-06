@@ -15,6 +15,7 @@ import {
   postLogin,
   postSendPage,
 } from "./index";
+import { env } from "../env";
 
 const LEASE_DURATION_MS = 10_000;
 const LEASE_POLL_INTERVAL_MS = 250;
@@ -49,8 +50,8 @@ function sleep(ms: number) {
 }
 
 function getRuntimeConfig(): RuntimeConfig {
-  const username = process.env.PAGEM_USERNAME;
-  const password = process.env.PAGEM_PASSWORD;
+  const username = env.PAGEM_USERNAME;
+  const password = env.PAGEM_PASSWORD;
 
   if (!username) {
     throw new Error("Missing PAGEM_USERNAME environment variable");
@@ -61,7 +62,7 @@ function getRuntimeConfig(): RuntimeConfig {
   }
 
   return {
-    baseUrl: process.env.PAGEM_BASE_URL ?? PAGEM_URL,
+    baseUrl: env.PAGEM_BASE_URL ?? PAGEM_URL,
     password,
     username,
   };
@@ -299,8 +300,8 @@ async function sendWithSession(
     csrfToken: authenticatedPage.csrfToken,
     // groupPageType: args.groupPageType,
     // pageeDirectoryEntryId: args.pageeDirectoryEntryId,
-    groupPageType: process.env.PAGEM_GROUP_PAGE_TYPE ?? "",
-    pageeDirectoryEntryId: parseInt(process.env.PAGEM_PAGE_DIRECTORY_ENTRY_ID ?? "0"),
+    groupPageType: env.PAGEM_GROUP_PAGE_TYPE ?? "",
+    pageeDirectoryEntryId: Number.parseInt(env.PAGEM_PAGE_DIRECTORY_ENTRY_ID ?? "0", 10),
     sessionCookie: refreshedCookie,
   });
   return sendResult;
@@ -310,7 +311,7 @@ export const sendPage = internalAction({
   args: sendPageArgs,
   returns: sendPageReturns,
   handler: async (ctx, args) => {
-      const config = getRuntimeConfig();
+    const config = getRuntimeConfig();
 
     try {
       const initialSession = await ensureSession(ctx, config);
