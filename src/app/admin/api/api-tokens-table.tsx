@@ -85,7 +85,7 @@ export function APITokensTable() {
       cell: ({ row }) => {
         return (
           <Button
-            variant="outline"
+            variant="destructive"
             onClick={() => setDeleteTarget(row.original)}
           >
             Delete
