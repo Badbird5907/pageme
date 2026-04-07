@@ -6,8 +6,8 @@ export default {
     {
       type: "customJwt",
       applicationID: env.AUTH_JWT_AUDIENCE,
-      issuer: env.AUTH_JWT_ISSUER,
-      jwks: `${env.AUTH_JWT_ISSUER}/.well-known/jwks.json`,
+      issuer: env.AUTH_JWT_ISSUER ?? env.CONVEX_SITE_URL,
+      jwks: `${env.AUTH_JWT_ISSUER ?? env.CONVEX_SITE_URL}/.well-known/jwks.json`,
       algorithm: "RS256",
     },
   ],

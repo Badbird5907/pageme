@@ -4,6 +4,10 @@ Pager is a web app that wraps [Pagem](https://www.pagem.com). It lets you give o
 
 It also exposes an MCP server for AI assistants.
 
+## Get Pagem Values
+
+To get the values required to send a page, log in to Pagem and invite a second user with another email you control. Use another device (Android or iOS) to onboard that account. Then, from the web dashboard while logged in as the second user, open Developer Tools (Ctrl+Shift+I) and go to the Network tab. Send a page and look for the request to `https://www.pagem.com/secure/pagees/sendPage`. The request payload will contain the values you need (`pageeDirectoryEntryId` and `groupPageType`).
+
 ## Local Setup
 
 1. Copy `.env.example` to `.env.local`.
@@ -57,12 +61,6 @@ AUTH_JWT_ISSUER=https://your-project.convex.site
 AUTH_JWT_AUDIENCE=pageme-web
 AUTH_JWT_KID=pageme-rs256-1
 AUTH_JWT_PUBLIC_JWK_JSON={"kty":"RSA","n":"...","e":"AQAB","alg":"RS256","kid":"pageme-rs256-1","use":"sig"}
-
-PAGEM_USERNAME=
-PAGEM_PASSWORD=
-PAGEM_BASE_URL=
-PAGEM_GROUP_PAGE_TYPE=
-PAGEM_PAGE_DIRECTORY_ENTRY_ID=
 ```
 
 ### Convex
@@ -110,25 +108,32 @@ pnpm auth:generate-jwt-keys
 
 ## Deploy
 
+### 0. Create a Production Convex Deployment
+
+On the Convex dashboard, under the environment dropdown, click on "Production" and follow the instructions to create a new production deployment.
+
 ### 1. Configure Env Vars
 
 Set the Next.js variables in Vercel project settings.
 
-Set the Convex variables either in the Convex dashboard or with the CLI:
+In the Convex dashboard, under Settings > Environment Variables, set the following variables (get the values from the output of `pnpm auth:generate-jwt-keys`):
 
-```bash
-npx convex env set AUTH_JWT_ISSUER https://your-project.convex.site
-npx convex env set AUTH_JWT_AUDIENCE pageme-web
-npx convex env set AUTH_JWT_KID pageme-rs256-1
-npx convex env set AUTH_JWT_PUBLIC_JWK_JSON '{"kty":"RSA","n":"...","e":"AQAB","alg":"RS256","kid":"pageme-rs256-1","use":"sig"}'
-npx convex env set AUTH_JWT_PRIVATE_KEY_PEM '-----BEGIN PRIVATE KEY-----
+```env
+AUTH_JWT_AUDIENCE=pageme-web
+AUTH_JWT_KID=pageme-rs256-1
+AUTH_JWT_PUBLIC_JWK_JSON={"kty":"RSA","n":"...","e":"AQAB","alg":"RS256","kid":"pageme-rs256-1","use":"sig"}
+AUTH_JWT_PRIVATE_KEY_PEM="-----BEGIN PRIVATE KEY-----
 ...
------END PRIVATE KEY-----'
+-----END PRIVATE KEY-----"
+PAGEM_GROUP_PAGE_TYPE="get this from pagem"
+PAGEM_PAGE_DIRECTORY_ENTRY_ID="get this from pagem"
+PAGEM_USERNAME="your credentials"
+PAGEM_PASSWORD="your credentials"
 ```
 
 ### 2. Deploy Convex
 
-Deploy backend functions first:
+Deploy backend functions:
 
 ```bash
 npx convex deploy
@@ -151,3 +156,4 @@ pnpm exec tsc --noEmit
 npx convex env list
 npx convex deploy
 ```
+

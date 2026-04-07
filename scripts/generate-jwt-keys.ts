@@ -43,7 +43,9 @@ async function main() {
   console.log("AUTH_JWT_PRIVATE_KEY_PEM=");
   console.log(privateKeyPem);
   console.log("");
-  console.log(`AUTH_JWT_PUBLIC_JWK_JSON=${JSON.stringify(publicJwk)}`);
+  console.log(`AUTH_JWT_PUBLIC_JWK_JSON="${JSON.stringify(publicJwk)}"`);
+  console.log("");
+  console.log("AUTH_JWT_AUDIENCE=pageme-web");
 }
 
 void main();

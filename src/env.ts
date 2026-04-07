@@ -4,7 +4,7 @@ import { z } from "zod";
 export const env = createEnv({
   server: {
     AUTH_JWT_AUDIENCE: z.string().min(1),
-    AUTH_JWT_ISSUER: z.string().url(),
+    AUTH_JWT_ISSUER: z.url().optional(),
     AUTH_JWT_KID: z.string().min(1),
     AUTH_JWT_PUBLIC_JWK_JSON: z.string().min(1),
   },

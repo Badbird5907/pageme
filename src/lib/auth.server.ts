@@ -10,7 +10,7 @@ export async function getAuthClaims(): Promise<JwtClaims | null> {
   try {
     return await verifyJwt(token, {
       audience: env.AUTH_JWT_AUDIENCE,
-      issuer: env.AUTH_JWT_ISSUER,
+      issuer: env.AUTH_JWT_ISSUER ?? env.NEXT_PUBLIC_CONVEX_SITE_URL,
       kid: env.AUTH_JWT_KID,
       publicJwkJson: env.AUTH_JWT_PUBLIC_JWK_JSON,
     });

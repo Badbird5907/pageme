@@ -31,7 +31,7 @@ type AuthenticatedUser = {
 function getJwtConfig(): JwtConfig {
   return {
     audience: env.AUTH_JWT_AUDIENCE,
-    issuer: env.AUTH_JWT_ISSUER,
+    issuer: env.AUTH_JWT_ISSUER ?? env.CONVEX_SITE_URL,
     kid: env.AUTH_JWT_KID,
     privateKeyPem: env.AUTH_JWT_PRIVATE_KEY_PEM,
     publicJwkJson: env.AUTH_JWT_PUBLIC_JWK_JSON,
