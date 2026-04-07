@@ -4,6 +4,10 @@ Pager is a web app that wraps [Pagem](https://www.pagem.com). It lets you give o
 
 It also exposes an MCP server for AI assistants.
 
+| Screenshot | History | Admin | MCP API Settings |
+| :---: | :---: | :---: | :---: |
+| ![Screenshot](https://i.imgur.com/MqFW7Tb.png) | ![History](https://i.imgur.com/2Jdbsg7.png) | ![Admin](https://i.imgur.com/r9Fy5iQ.png) | ![MCP API Settings](https://i.imgur.com/y6QUVIU.png) |
+
 ## Get Pagem Values
 
 To get the values required to send a page, log in to Pagem and invite a second user with another email you control. Use another device (Android or iOS) to onboard that account. Then, from the web dashboard while logged in as the second user, open Developer Tools (Ctrl+Shift+I) and go to the Network tab. Send a page and look for the request to `https://www.pagem.com/secure/pagees/sendPage`. The request payload will contain the values you need (`pageeDirectoryEntryId` and `groupPageType`).
