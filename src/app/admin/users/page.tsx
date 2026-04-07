@@ -10,9 +10,46 @@ import { AddUserDialog } from "@/app/admin/users/add";
 import { DeleteUserDialog } from "@/app/admin/users/delete";
 import { EditUserDialog } from "@/app/admin/users/edit";
 import { Ban, Shield } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+const PIN_REVEAL_DELAY_MS = 2500;
+
+function PinRevealCell({ pin }: { pin: string }) {
+  const [revealed, setRevealed] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearTimer = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  };
+
+  useEffect(() => () => clearTimer(), []);
+
+  return (
+    <span
+      className={revealed ? undefined : "[-webkit-text-security:disc]"}
+      onPointerEnter={() => {
+        clearTimer();
+        setRevealed(false);
+        timerRef.current = setTimeout(() => {
+          setRevealed(true);
+          timerRef.current = null;
+        }, PIN_REVEAL_DELAY_MS);
+      }}
+      onPointerLeave={() => {
+        clearTimer();
+        setRevealed(false);
+      }}
+      title="Keep pointer here for a few seconds to reveal"
+    >
+      {pin}
+    </span>
+  );
+}
 
 export default function AdminUsersPage() {
   const users = useQuery(api.admin.listUsers); // we're just loading all users here in memory
@@ -40,14 +77,10 @@ export default function AdminUsersPage() {
       accessorKey: "pin",
       meta: {
         headerClassName: "w-18",
-        cellClassName: "group w-18",
+        cellClassName: "w-18",
       },
       cell: ({ row }) => {
-        return (
-          <span className="[-webkit-text-security:disc] group-hover:[-webkit-text-security:none]">
-            {row.original.pin}
-          </span>
-        );
+        return <PinRevealCell pin={row.original.pin} />;
       },
     },
     {
