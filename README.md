@@ -29,7 +29,7 @@ NEXT_PUBLIC_CONVEX_SITE_URL=https://your-project.convex.site
 
 AUTH_JWT_ISSUER=https://your-project.convex.site
 AUTH_JWT_AUDIENCE=pageme-web
-AUTH_JWT_KID=pageme-rs256-1
+AUTH_JWT_KID=pageme-rs256-1 # this should match the kid in the public JWK
 AUTH_JWT_PUBLIC_JWK_JSON={"kty":"RSA","n":"...","e":"AQAB","alg":"RS256","kid":"pageme-rs256-1","use":"sig"}
 AUTH_JWT_PRIVATE_KEY_PEM="-----BEGIN PRIVATE KEY-----
 ...
@@ -59,7 +59,7 @@ NEXT_PUBLIC_CONVEX_URL=https://your-project.convex.cloud
 NEXT_PUBLIC_CONVEX_SITE_URL=https://your-project.convex.site
 AUTH_JWT_ISSUER=https://your-project.convex.site
 AUTH_JWT_AUDIENCE=pageme-web
-AUTH_JWT_KID=pageme-rs256-1
+AUTH_JWT_KID=pageme-rs256-1 # this should match the kid in the public JWK
 AUTH_JWT_PUBLIC_JWK_JSON={"kty":"RSA","n":"...","e":"AQAB","alg":"RS256","kid":"pageme-rs256-1","use":"sig"}
 ```
 
@@ -70,7 +70,7 @@ These variables must be configured on the Convex deployment:
 ```env
 AUTH_JWT_ISSUER=https://your-project.convex.site
 AUTH_JWT_AUDIENCE=pageme-web
-AUTH_JWT_KID=pageme-rs256-1
+AUTH_JWT_KID=pageme-rs256-1 # this should match the kid in the public JWK
 AUTH_JWT_PUBLIC_JWK_JSON={"kty":"RSA","n":"...","e":"AQAB","alg":"RS256","kid":"pageme-rs256-1","use":"sig"}
 AUTH_JWT_PRIVATE_KEY_PEM="-----BEGIN PRIVATE KEY-----
 ...
@@ -120,7 +120,7 @@ In the Convex dashboard, under Settings > Environment Variables, set the followi
 
 ```env
 AUTH_JWT_AUDIENCE=pageme-web
-AUTH_JWT_KID=pageme-rs256-1
+AUTH_JWT_KID=pageme-rs256-1 # this should match the kid in the public JWK
 AUTH_JWT_PUBLIC_JWK_JSON={"kty":"RSA","n":"...","e":"AQAB","alg":"RS256","kid":"pageme-rs256-1","use":"sig"}
 AUTH_JWT_PRIVATE_KEY_PEM="-----BEGIN PRIVATE KEY-----
 ...

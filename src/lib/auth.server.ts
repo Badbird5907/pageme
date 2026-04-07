@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 export async function getAuthClaims(): Promise<JwtClaims | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
+  console.log("token", token);
   if (!token) return null;
   try {
     return await verifyJwt(token, {
@@ -14,12 +15,15 @@ export async function getAuthClaims(): Promise<JwtClaims | null> {
       kid: env.AUTH_JWT_KID,
       publicJwkJson: env.AUTH_JWT_PUBLIC_JWK_JSON,
     });
-  } catch {
+  } catch (e) {
+    console.log("error verifying JWT");
+    console.log(e);
     return null;
   }
 }
 
 export async function isAuthenticated(): Promise<boolean> {
   const claims = await getAuthClaims();
+  console.log("claims", claims);
   return claims !== null;
 }
