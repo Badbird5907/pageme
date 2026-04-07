@@ -1,12 +1,14 @@
 # Pager
 
-Pager is a web app that wraps [Pagem](https://www.pagem.com). It lets you give out pager access without paying for additional Pagem seats.
+Pager is a web app that wraps [Pagem](https://www.pagem.com). Users can send pages via Pagem, without needing to pay for additional seats/API access.
 
 It also exposes an MCP server for AI assistants.
 
-| Screenshot | History | Admin | MCP API Settings |
+| Pager | History | Admin | MCP API Settings |
 | :---: | :---: | :---: | :---: |
 | ![Screenshot](https://i.imgur.com/MqFW7Tb.png) | ![History](https://i.imgur.com/2Jdbsg7.png) | ![Admin](https://i.imgur.com/r9Fy5iQ.png) | ![MCP API Settings](https://i.imgur.com/y6QUVIU.png) |
+
+[Video Demo](https://youtube.com/watch?v=zYOWyxfwU_M)
 
 ## Get Pagem Values
 
