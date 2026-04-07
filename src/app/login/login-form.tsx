@@ -174,9 +174,6 @@ export function LoginForm() {
                     }}
                     aria-invalid={isInvalid || showStepError}
                   />
-                  <FieldDescription>
-                    Use the username tied to your pager account.
-                  </FieldDescription>
                   {isInvalid && errors.length ? (
                     <FieldError>{errors[0]}</FieldError>
                   ) : null}
