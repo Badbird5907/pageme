@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "auth:generate-jwt-keys": "tsx scripts/generate-jwt-keys.ts",
     "dev": "next dev -p 2918",
     "build": "next build",
     "start": "next start",
@@ -46,6 +47,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.7",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }
