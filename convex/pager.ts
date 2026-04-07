@@ -500,3 +500,10 @@ export const listMyPageHistory = query({
       .paginate(args.paginationOpts);
   },
 });
+
+export const amIMuted = query({
+  handler: async (ctx) => {
+    const { user } = await requireUser(ctx);
+    return user.muted;
+  },
+})

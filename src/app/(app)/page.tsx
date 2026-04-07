@@ -1,6 +1,6 @@
 "use client";
 
-import { useAction } from "convex/react";
+import { useAction, useQuery } from "convex/react";
 import {
   CheckCircle2Icon,
   Loader2Icon,
@@ -51,6 +51,7 @@ function getErrorMessage(error: unknown): string {
 
 export default function Page() {
   const sendPage = useAction(api.pager.sendPage);
+  const amIMuted = useQuery(api.pager.amIMuted);
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -109,6 +110,14 @@ export default function Page() {
                 <span>Your page was queued. Please do not spam this</span>
               </div>
             ) : null}
+            {amIMuted ? (
+              <div
+                role="status"
+                className="mt-4 flex items-start gap-2 rounded-lg border border-border bg-muted/50 px-3 py-2.5 text-sm"
+              >
+                <span>You are muted. You cannot send pages.</span>
+              </div>
+            ) : null}
           </CardDescription>
         </CardHeader>
 
@@ -128,7 +137,7 @@ export default function Page() {
                   value={message}
                   rows={5}
                   placeholder="Check discord right now..."
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || amIMuted}
                   className="min-h-12 resize-y"
                   onChange={(e) => {
                     setError(null);
@@ -159,21 +168,23 @@ export default function Page() {
 
           <CardFooter className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <Button
-              disabled={!canSend}
+              disabled={!canSend || amIMuted}
               size="lg"
               className="w-full gap-2"
               type="submit"
             >
-              {isSubmitting ? (
-                <>
-                  <Loader2Icon className="size-4 animate-spin" aria-hidden />
-                  Sending…
-                </>
-              ) : (
-                <>
-                  <SendHorizontalIcon className="size-4" aria-hidden />
-                  Send page
-                </>
+              {amIMuted ? "You are muted" : (
+                isSubmitting ? (
+                  <>
+                    <Loader2Icon className="size-4 animate-spin" aria-hidden />
+                    Sending…
+                  </>
+                ) : (
+                  <>
+                    <SendHorizontalIcon className="size-4" aria-hidden />
+                    Send page
+                  </>
+                )
               )}
             </Button>
           </CardFooter>
