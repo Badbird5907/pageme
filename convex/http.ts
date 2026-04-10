@@ -56,7 +56,14 @@ app.post("/auth/login", async (c) => {
 
   try {
     const token = await c.env.runMutation(internal.auth.getLoginToken, parsed.data);
-    return c.json({ token: token.token, isAdmin: token.isAdmin }, 200);
+    return c.json(
+      {
+        token: token.token,
+        expiresAt: token.expiresAt,
+        isAdmin: token.isAdmin,
+      },
+      200,
+    );
   } catch (error) {
     if (error instanceof ConvexError) {
       return c.json({ error: error.message }, 401);

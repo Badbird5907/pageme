@@ -8,7 +8,6 @@ import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import {
   Field,
-  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -68,7 +67,7 @@ function getErrorMessages(errors: readonly unknown[]) {
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isLoading, isAuthenticated, login } = useAuth();
+  const { isLoading, isAuthenticated, login, username } = useAuth();
 
   const redirectTo = safeRedirectPath(searchParams.get("redirect"));
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -102,6 +101,17 @@ export function LoginForm() {
       }
     },
   });
+
+  useEffect(() => {
+    if (!username) {
+      return;
+    }
+    const existingUsername = form.store.state.values.username.trim();
+    if (existingUsername.length > 0) {
+      return;
+    }
+    form.setFieldValue("username", username);
+  }, [form, username]);
 
   const usernameDisplay = useStore(
     form.store,
