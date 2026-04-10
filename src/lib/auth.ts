@@ -41,10 +41,13 @@ async function getCookie(name: string): Promise<CookieValue | null> {
 
 async function setCookie(name: string, value: string, options?: CookieOptions) {
   if ("cookieStore" in window) {
+    const expires =
+      options?.expires instanceof Date ? options.expires.getTime() : undefined;
+
     await window.cookieStore.set({
       name,
       value,
-      expires: options?.expires,
+      expires,
       path: "/",
     });
     return;
@@ -154,7 +157,8 @@ export const useAuth = () => {
       getCookie("admin"),
     ]);
 
-    const hasValidToken = Boolean(tokenCookie?.value) && !isTokenExpired(tokenCookie.value);
+    const tokenValue = tokenCookie?.value ?? null;
+    const hasValidToken = tokenValue !== null && !isTokenExpired(tokenValue);
     const isLoggedIn = hasValidToken;
     setAuthenticated(isLoggedIn);
     setUsername(usernameCookie?.value ?? null);
