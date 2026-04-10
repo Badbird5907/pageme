@@ -8,6 +8,10 @@ type CookieValue = {
   value: string;
 };
 
+type CookieOptions = {
+  expires?: Date;
+};
+
 function readDocumentCookie(name: string) {
   if (typeof document === "undefined") {
     return null;
@@ -35,13 +39,22 @@ async function getCookie(name: string): Promise<CookieValue | null> {
   return value === null ? null : { name, value };
 }
 
-async function setCookie(name: string, value: string) {
+async function setCookie(name: string, value: string, options?: CookieOptions) {
   if ("cookieStore" in window) {
-    await window.cookieStore.set(name, value);
+    const expires =
+      options?.expires instanceof Date ? options.expires.getTime() : undefined;
+
+    await window.cookieStore.set({
+      name,
+      value,
+      expires,
+      path: "/",
+    });
     return;
   }
 
-  document.cookie = `${name}=${encodeURIComponent(value)}; path=/`;
+  const expires = options?.expires ? `; Expires=${options.expires.toUTCString()}` : "";
+  document.cookie = `${name}=${encodeURIComponent(value)}${expires}; path=/`;
 }
 
 async function deleteCookie(name: string) {
@@ -51,6 +64,35 @@ async function deleteCookie(name: string) {
   }
 
   document.cookie = `${name}=; Max-Age=0; path=/`;
+}
+
+function parseJwtExpirationMs(token: string): number | null {
+  const parts = token.split(".");
+  if (parts.length !== 3) {
+    return null;
+  }
+
+  try {
+    const normalized = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+    const payload = JSON.parse(atob(padded)) as {
+      exp?: unknown;
+    };
+    if (typeof payload.exp !== "number") {
+      return null;
+    }
+    return payload.exp * 1000;
+  } catch {
+    return null;
+  }
+}
+
+function isTokenExpired(token: string): boolean {
+  const expirationMs = parseJwtExpirationMs(token);
+  if (!expirationMs) {
+    return true;
+  }
+  return Date.now() >= expirationMs;
 }
 
 export const login = async (username: string, pin: string) => {
@@ -63,10 +105,17 @@ export const login = async (username: string, pin: string) => {
     throw new Error("Failed to login");
   }
 
-  const data = (await response.json()) as { isAdmin?: boolean; token: string };
+  const data = (await response.json()) as {
+    expiresAt?: number;
+    isAdmin?: boolean;
+    token: string;
+  };
+
+  const tokenExpiryMs = parseJwtExpirationMs(data.token) ?? data.expiresAt ?? null;
+  const tokenExpiry = tokenExpiryMs ? new Date(tokenExpiryMs) : undefined;
 
   await Promise.all([
-    setCookie("token", data.token),
+    setCookie("token", data.token, { expires: tokenExpiry }),
     setCookie("username", username),
     setCookie("admin", data.isAdmin === true ? "true" : "false"),
   ]);
@@ -85,7 +134,10 @@ export const logout = async () => {
 
 export const isAuthenticated = async () => {
   const token = await getCookie("token");
-  return token !== null;
+  if (!token?.value) {
+    return false;
+  }
+  return !isTokenExpired(token.value);
 };
 
 export const useAuth = () => {
@@ -105,7 +157,9 @@ export const useAuth = () => {
       getCookie("admin"),
     ]);
 
-    const isLoggedIn = Boolean(tokenCookie?.value);
+    const tokenValue = tokenCookie?.value ?? null;
+    const hasValidToken = tokenValue !== null && !isTokenExpired(tokenValue);
+    const isLoggedIn = hasValidToken;
     setAuthenticated(isLoggedIn);
     setUsername(usernameCookie?.value ?? null);
     setIsAdmin(isLoggedIn && adminCookie?.value === "true");
